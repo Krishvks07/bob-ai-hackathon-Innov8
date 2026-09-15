@@ -1,21 +1,11 @@
-# Problem Statement
+# Problem Statement – U1 Power Outage Prediction & Grid Equipment Failure Advisor
 
-## Background
+Military and civilian utilities cannot reliably determine mission- or service-readiness of transformers and substations. Maintenance is still calendar-driven. HUMS-style sensors already measure temperature, vibration, partial discharge and oil quality and show failure signatures weeks in advance, yet the data is almost never analysed in time. Weather forecasts sit in a completely separate system.
 
-[Describe the broader context. What domain or industry does this problem belong to? What situation creates the problem?]
+When a transformer fails unexpectedly the outage costs $1M+/hour and recovery can take days. Industry-wide maintenance spend is tens of billions of dollars per year. Shifting even a fraction of assets from reactive to predicted maintenance saves millions.
 
-## The Problem
-
-[State the problem clearly and specifically. Avoid vague statements like "things are slow" — instead say "Operations teams spend an average of 45 minutes per incident diagnosing pipeline failures because logs are scattered across 6 different tools."]
-
-## Who is Affected
-
-[Describe the specific user or persona experiencing this problem. Be concrete — not "developers" but "backend engineers managing CI/CD pipelines in enterprises with 50+ microservices."]
-
-## Why It Matters
-
-[What is the cost of this problem? Lost time? Revenue? Safety risk? Frustration? Quantify if possible.]
-
-## Why Existing Solutions Fall Short
-
-[Briefly explain what people currently do and why it doesn't fully solve the problem. This sets up why your solution is needed.]
+Grid operators need a single view that combines:
+- current sensor health
+- weather severity forecast
+- grid-impact of each asset
+into a prioritised, explainable action plan.
