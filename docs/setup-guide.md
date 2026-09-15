@@ -15,6 +15,7 @@
 - A Top-8 bar chart
 - After clicking the button, a detailed prioritised plan appears at the bottom
 
+
 ## Troubleshooting
 | Problem                    | Solution                              |
 |---------------------------|---------------------------------------|
