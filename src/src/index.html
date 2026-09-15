@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GridGuard AI – Outage & Equipment Failure Advisor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --ok: #22c55e;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 1.5rem;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 1.5rem; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .btn {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn:hover { opacity: 0.9; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td { padding: 0.5rem 0.6rem; text-align: left; border-bottom: 1px solid #334155; }
+    th { color: var(--muted); cursor: pointer; user-select: none; }
+    th:hover { color: var(--accent); }
+    .risk-critical { color: var(--danger); font-weight: 700; }
+    .risk-high { color: var(--warn); font-weight: 600; }
+    .risk-med { color: #fbbf24; }
+    .risk-low { color: var(--ok); }
+    #planOutput {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      max-height: 420px;
+      overflow-y: auto;
+      border: 1px solid #334155;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-critical { background: #7f1d1d; color: #fecaca; }
+    .badge-high { background: #78350f; color: #fde68a; }
+    .badge-med { background: #365314; color: #d9f99d; }
+    .legend { font-size: 0.8rem; color: var(--muted); margin-top: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>⚡ GridGuard AI</h1>
+      <p class="subtitle">Outage & Equipment Failure Advisor · IBM BoB AI Innovation Hackathon 2026 · Team Innov8</p>
+    </div>
+    <button class="btn" onclick="generatePlan()">Generate Maintenance & Crew Plan</button>
+  </div>
+
+  <div class="grid">
+    <!-- Ranked Table -->
+    <div class="card">
+      <h2>Asset Risk Ranking (click column to sort)</h2>
+      <div style="overflow-x:auto">
+        <table id="assetTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">Asset</th>
+              <th onclick="sortTable(1)">Region</th>
+              <th onclick="sortTable(2)">Risk</th>
+              <th onclick="sortTable(3)">Level</th>
+              <th onclick="sortTable(4)">Grid Impact</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <p class="legend">Risk = 0.20×age + 0.18×hotspot + 0.14×vibration + 0.14×PD + 0.14×(1−oil) + 0.08×days + 0.12×weather</p>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+      <h2>Top-8 Highest Risk Assets</h2>
+      <canvas id="riskChart" height="260"></canvas>
+    </div>
+  </div>
+
+  <!-- Plan Output -->
+  <div class="card">
+    <h2>Maintenance & Crew Pre-Positioning Plan</h2>
+    <div id="planOutput">Click the button above to generate a prioritised action plan (risk × grid-impact).</div>
+  </div>
+
+<script>
+/* ============================================================
+   SYNTHETIC FLEET (18 assets) – realistic failure signatures
+   ============================================================ */
+const assets = [
+  { id: "TX-101", region: "North", age: 28, hotspot: 92, vibration: 0.78, pd: 0.65, oil: 0.42, days: 410, weather: 0.85, impact: 9, type: "Transformer" },
+  { id: "TX-204", region: "East",  age: 22, hotspot: 88, vibration: 0.71, pd: 0.58, oil: 0.51, days: 320, weather: 0.70, impact: 8, type: "Transformer" },
+  { id: "SS-07",  region: "North", age: 19, hotspot: 81, vibration: 0.55, pd: 0.42, oil: 0.68, days: 180, weather: 0.85, impact: 7, type: "Substation" },
+  { id: "TX-315", region: "West",  age: 31, hotspot: 95, vibration: 0.82, pd: 0.71, oil: 0.35, days: 520, weather: 0.60, impact: 6, type: "Transformer" },
+  { id: "CB-12",  region: "South", age: 15, hotspot: 74, vibration: 0.48, pd: 0.31, oil: 0.75, days: 95,  weather: 0.45, impact: 5, type: "Circuit Breaker" },
+  { id: "TX-088", region: "East",  age: 25, hotspot: 86, vibration: 0.67, pd: 0.55, oil: 0.48, days: 290, weather: 0.70, impact: 9, type: "Transformer" },
+  { id: "SS-19",  region: "West",  age: 17, hotspot: 79, vibration: 0.52, pd: 0.38, oil: 0.71, days: 140, weather: 0.60, impact: 4, type: "Substation" },
+  { id: "TX-402", region: "North", age: 29, hotspot: 91, vibration: 0.75, pd: 0.63, oil: 0.39, days: 450, weather: 0.85, impact: 8, type: "Transformer" },
+  { id: "CB-05",  region: "South", age: 12, hotspot: 68, vibration: 0.41, pd: 0.25, oil: 0.82, days: 60,  weather: 0.45, impact: 3, type: "Circuit Breaker" },
+  { id: "TX-177", region: "East",  age: 21, hotspot: 84, vibration: 0.62, pd: 0.49, oil: 0.55, days: 210, weather: 0.70, impact: 7, type: "Transformer" },
+  { id: "SS-03",  region: "West",  age: 24, hotspot: 87, vibration: 0.69, pd: 0.57, oil: 0.46, days: 370, weather: 0.60, impact: 6, type: "Substation" },
+  { id: "TX-256", region: "South", age: 18, hotspot: 76, vibration: 0.50, pd: 0.36, oil: 0.73, days: 125, weather: 0.45, impact: 5, type: "Transformer" },
+  { id: "CB-21",  region: "North", age: 14, hotspot: 72, vibration: 0.45, pd: 0.29, oil: 0.78, days: 80,  weather: 0.85, impact: 4, type: "Circuit Breaker" },
+  { id: "TX-099", region: "East",  age: 27, hotspot: 90, vibration: 0.73, pd: 0.61, oil: 0.41, days: 390, weather: 0.70, impact: 9, type: "Transformer" },
+  { id: "SS-14",  region: "West",  age: 16, hotspot: 77, vibration: 0.53, pd: 0.40, oil: 0.69, days: 155, weather: 0.60, impact: 5, type: "Substation" },
+  { id: "TX-333", region: "South", age: 20, hotspot: 83, vibration: 0.60, pd: 0.47, oil: 0.58, days: 240, weather: 0.45, impact: 6, type: "Transformer" },
+  { id: "CB-08",  region: "North", age: 11, hotspot: 65, vibration: 0.38, pd: 0.22, oil: 0.85, days: 45,  weather: 0.85, impact: 2, type: "Circuit Breaker" },
+  { id: "TX-501", region: "East",  age: 26, hotspot: 89, vibration: 0.70, pd: 0.59, oil: 0.44, days: 340, weather: 0.70, impact: 8, type: "Transformer" }
+];
+
+/* ============================================================
+   RISK SCORING ENGINE (exactly as in the presentation)
+   ============================================================ */
+function normalize(value, min, max) {
+  return Math.max(0, Math.min(1, (value - min) / (max - min)));
+}
+
+function calcRisk(a) {
+  const ageN      = normalize(a.age, 10, 35);
+  const hotN      = normalize(a.hotspot, 60, 100);
+  const vibN      = a.vibration;          // already 0-1
+  const pdN       = a.pd;                 // already 0-1
+  const oilN      = 1 - a.oil;            // lower oil quality = higher risk
+  const daysN     = normalize(a.days, 0, 600);
+  const weatherN  = a.weather;            // already 0-1
+
+  const risk =
+    0.20 * ageN +
+    0.18 * hotN +
+    0.14 * vibN +
+    0.14 * pdN +
+    0.14 * oilN +
+    0.08 * daysN +
+    0.12 * weatherN;
+
+  return Math.round(risk * 100);
+}
+
+function riskLevel(score) {
+  if (score >= 75) return "CRITICAL";
+  if (score >= 60) return "HIGH";
+  if (score >= 40) return "MEDIUM";
+  return "LOW";
+}
+
+/* ============================================================
+   PRE-COMPUTE SCORES
+   ============================================================ */
+assets.forEach(a => {
+  a.risk = calcRisk(a);
+  a.level = riskLevel(a.risk);
+});
+
+/* ============================================================
+   RENDER TABLE
+   ============================================================ */
+let sortCol = 2; // default sort by risk
+let sortAsc = false;
+
+function renderTable() {
+  const tbody = document.getElementById("tableBody");
+  const sorted = [...assets].sort((a, b) => {
+    let va, vb;
+    if (sortCol === 0) { va = a.id; vb = b.id; }
+    else if (sortCol === 1) { va = a.region; vb = b.region; }
+    else if (sortCol === 2) { va = a.risk; vb = b.risk; }
+    else if (sortCol === 3) { va = a.level; vb = b.level; }
+    else { va = a.impact; vb = b.impact; }
+
+    if (typeof va === "string") return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortAsc ? va - vb : vb - va;
+  });
+
+  tbody.innerHTML = sorted.map(a => {
+    const cls = a.level === "CRITICAL" ? "risk-critical" :
+                a.level === "HIGH"     ? "risk-high" :
+                a.level === "MEDIUM"   ? "risk-med" : "risk-low";
+    const badge = a.level === "CRITICAL" ? "badge-critical" :
+                  a.level === "HIGH"     ? "badge-high" : "badge-med";
+    return `<tr>
+      <td><strong>${a.id}</strong><br><small style="color:#94a3b8">${a.type}</small></td>
+      <td>${a.region}</td>
+      <td class="${cls}">${a.risk}</td>
+      <td><span class="badge ${badge}">${a.level}</span></td>
+      <td>${a.impact}/10</td>
+    </tr>`;
+  }).join("");
+}
+
+function sortTable(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = false; }
+  renderTable();
+}
+
+/* ============================================================
+   CHART
+   ============================================================ */
+let chart;
+function renderChart() {
+  const top8 = [...assets].sort((a,b) => b.risk - a.risk).slice(0, 8);
+  const ctx = document.getElementById("riskChart").getContext("2d");
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: top8.map(a => a.id),
+      datasets: [{
+        label: "Risk Score",
+        data: top8.map(a => a.risk),
+        backgroundColor: top8.map(a =>
+          a.risk >= 75 ? "#ef4444" :
+          a.risk >= 60 ? "#f59e0b" : "#38bdf8"
+        ),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 100, ticks: { color: "#94a3b8" }, grid: { color: "#334155" } },
+        x: { ticks: { color: "#94a3b8" }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+/* ============================================================
+   MAINTENANCE & CREW PLAN GENERATOR
+   (risk × grid-impact re-rank)
+   ============================================================ */
+function generatePlan() {
+  const actionable = assets
+    .filter(a => a.level === "CRITICAL" || a.level === "HIGH")
+    .map(a => ({ ...a, priority: a.risk * a.impact }))
+    .sort((a, b) => b.priority - a.priority);
+
+  if (actionable.length === 0) {
+    document.getElementById("planOutput").textContent = "No CRITICAL or HIGH risk assets at this time.";
+    return;
+  }
+
+  // Region that needs crews first
+  const regionCount = {};
+  actionable.forEach(a => {
+    regionCount[a.region] = (regionCount[a.region] || 0) + 1;
+  });
+  const topRegion = Object.entries(regionCount).sort((a,b) => b[1]-a[1])[0][0];
+
+  let out = `GRIDGUARD AI – MAINTENANCE & CREW PRE-POSITIONING PLAN\n`;
+  out += `Generated: ${new Date().toLocaleString()}\n`;
+  out += `────────────────────────────────────────────────────────────\n\n`;
+  out += `▶ PRIORITY REGION FOR CREW PRE-POSITIONING: ${topRegion}\n`;
+  out += `  (${regionCount[topRegion]} high-priority assets)\n\n`;
+
+  actionable.forEach((a, i) => {
+    const window = a.risk >= 75 ? "24–48 hours (URGENT)" : "5–7 days";
+    out += `${i+1}. ${a.id} (${a.type}) – ${a.region}\n`;
+    out += `   Risk: ${a.risk}  |  Grid Impact: ${a.impact}/10  |  Priority Score: ${a.priority}\n`;
+    out += `   Action Window: ${window}\n`;
+    out += `   Key Drivers: Hotspot ${a.hotspot}°C · Vibration ${a.vibration} · PD ${a.pd} · Oil ${a.oil} · Days since maint. ${a.days}\n`;
+    out += `   Recommended Action: Inspect & schedule ${a.type.toLowerCase()} intervention\n\n`;
+  });
+
+  out += `────────────────────────────────────────────────────────────\n`;
+  out += `Total actionable assets: ${actionable.length}\n`;
+  out += `This plan is explainable – every score can be traced to the 7 weighted factors.`;
+
+  document.getElementById("planOutput").textContent = out;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderTable();
+renderChart();
+</script>
+</body>
+</html>
