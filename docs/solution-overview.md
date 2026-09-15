@@ -26,3 +26,16 @@ All factors are normalised. The operator can see exactly why an asset scored wha
 - Completely transparent (no black-box model)  
 - Zero infrastructure – single HTML file  
 - Designed so a real operator can open it and act in under 60 seconds
+
+
+# Solution Overview
+
+GridGuard AI is a single-page, zero-install dashboard that:
+
+1. Scores every asset with a transparent 7-factor risk model
+2. Visualises the ranked fleet
+3. Generates a prioritised maintenance & crew pre-positioning plan with one click
+
+The risk formula is deliberately explainable so operators and regulators can see exactly why an asset scored what it did.
+
+Assets are then re-ranked by **risk × grid-impact** so that a transformer feeding a hospital is prioritised even if its raw risk is slightly lower than one in a low-impact area.
