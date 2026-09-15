@@ -17,17 +17,17 @@ submission:
   problem_statement: >
     Power transformer and substation failures cause blackouts costing utilities $1M+/hour.
     Most utilities still use calendar-based maintenance while sensors already show failure
-    signatures weeks in advance. Weather events compound the risk but are never combined
-    with sensor data in time to act.
+    signatures weeks in advance. Weather forecasts are never combined with sensor data
+    in time to act.
   solution_summary: >
-    GridGuard AI is an explainable, zero-install browser dashboard that scores every grid
-    asset (0-100) using seven weighted factors (age, hotspot temperature, vibration,
-    partial discharge, oil quality, days since maintenance, weather severity). It then
-    re-ranks critical assets by risk × grid-impact and generates a prioritised 24-48h /
-    5-7 day maintenance & crew pre-positioning plan.
+    GridGuard AI is a zero-install browser dashboard that scores every grid asset with an
+    explainable 7-factor risk model (age, hotspot temperature, vibration, partial discharge,
+    oil quality, days since maintenance, weather severity). It then re-ranks CRITICAL/HIGH
+    assets by risk × grid-impact and generates a prioritised maintenance & crew
+    pre-positioning plan with one click.
   key_features:
-    - "Explainable multi-factor risk score (0-100) with full transparency of weights"
-    - "Risk × grid-impact re-ranking so high-impact assets (hospitals, critical feeders) are prioritised"
-    - "One-click Maintenance & Crew Plan generator with time windows"
-    - "Zero dependencies – single HTML file that runs offline in any browser"
-    - "Built with IBM Bob assistance for scaffolding, iteration and code review"
+    - "Explainable risk score (0-100) using 7 weighted, fully transparent factors"
+    - "One-click Maintenance & Crew Plan Generator (risk × grid-impact ranking)"
+    - "Live sortable table + Top-8 risk chart"
+    - "Zero-install single HTML file – runs anywhere with no API keys or backend"
+    - "IBM Bob used for scaffolding the risk engine, iterating the plan logic, and final code review"
