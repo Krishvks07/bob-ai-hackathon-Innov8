@@ -1,121 +1,44 @@
-# 🚀 [Your Project Title Here]
+# GridGuard AI – Outage & Equipment Failure Advisor
 
-> ⚠️ **Replace everything in `[ ]` brackets with your actual content before submission.**
+**Team:** Innov8  
+**Track:** AI  
+**Problem:** U1 – Power Outage Prediction & Grid Equipment Failure Advisor  
+**GitHub:** https://github.com/Krishvks07/bob-ai-hackathon-Innov8
 
----
+## Problem
+Utilities still maintain transformers and substations on fixed calendar schedules. Sensors already collect temperature, vibration, partial discharge and oil quality data that show failures weeks in advance, but the data sits unused. Weather forecasts live in a separate system, so a heatwave hitting a degrading transformer never raises urgency. Result: $1M+/hour outages.
 
-## 👥 Team
+## Solution
+GridGuard AI is a single-file, zero-install dashboard that:
+1. Scores every asset 0-100 with seven transparent weighted factors.
+2. Re-ranks CRITICAL/HIGH assets by **risk × grid-impact**.
+3. Generates a prioritised maintenance & crew pre-positioning plan with concrete time windows.
 
-| Field | Value |
-|---|---|
-| **Team Name** | [Your Team Name] |
-| **Track** | [AI / DevOps / Sustainability / Open] |
-| **Team Lead** | [Name] — [email@ibm.com] |
-| **Members** | [Name 1], [Name 2], [Name 3] |
+## Key Features
+- Explainable risk model (no black box)
+- Risk × impact prioritisation
+- One-click action plan
+- Runs completely offline – no API keys, no installs
 
----
+## Tech Stack
+- Pure HTML + CSS + vanilla JavaScript (single file)
+- IBM Bob used for scaffolding the risk engine, refining the ranking logic and final code review
 
-## 🎯 Problem Statement
+## How to Run
+1. Open `src/index.html` in any modern browser (Chrome / Edge / Firefox).
+2. Click column headers to sort the table.
+3. Click **Generate Maintenance & Crew Plan**.
 
-> In 2–3 sentences: What problem does your project solve? Who experiences this problem?
+That’s it – zero dependencies.
 
-[Describe the real-world problem your project addresses. Be specific about who the user is and what pain point they face.]
+## Demo
+- Live demo: open `src/index.html`
+- Screenshots: see `demo/screenshots/`
+- Video: see `demo/demo-video-link.txt`
 
----
+## Known Limitations
+- Uses a synthetic 18-asset fleet (realistic for a 1-day hackathon)
+- Heuristic model (ready to be replaced by a watsonx.ai trained model)
 
-## 💡 Solution
-
-> In 2–3 sentences: What did you build? How does it solve the problem above?
-
-[Describe your solution clearly. Explain the core mechanism — what makes it work.]
-
----
-
-## ✨ Key Features
-
-- **Feature 1:** [Brief description — e.g., "Real-time anomaly detection using watsonx.ai"]
-- **Feature 2:** [Brief description]
-- **Feature 3:** [Brief description]
-- **Feature 4:** [Optional]
-- **Feature 5:** [Optional]
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Technologies |
-|---|---|
-| **Languages** | [e.g., Python, TypeScript] |
-| **Frameworks** | [e.g., FastAPI, React] |
-| **IBM Technologies** | [e.g., watsonx.ai, IBM Bob, IBM Cloud] |
-| **Databases** | [e.g., PostgreSQL, Redis] |
-| **Other** | [e.g., Docker, GitHub Actions] |
-
----
-
-## 📁 Repository Structure
-
-```
-├── src/                  # All source code
-├── docs/                 # Written documentation
-│   ├── problem-statement.md
-│   ├── solution-overview.md
-│   ├── architecture.md
-│   └── setup-guide.md
-├── demo/                 # Demo artifacts
-│   ├── screenshots/      # App screenshots
-│   └── demo-video-link.txt  # Link to demo video
-├── presentation/         # Slide deck
-└── submission.yaml       # Structured submission metadata
-```
-
----
-
-## ⚡ How to Run
-
-> **Copy these exact steps from your [`docs/setup-guide.md`](docs/setup-guide.md)**
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/[your-repo].git
-cd [your-repo]
-
-# 2. Install dependencies
-[your install command here]
-
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your values
-
-# 4. Run the project
-[your run command here]
-```
-
----
-
-## 🖥️ Demo
-
-| Artifact | Link |
-|---|---|
-| 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
-| 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
-| 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/slides.pdf](presentation/) |
-
----
-
-## ⚠️ Known Limitations
-
-> Be honest — judges appreciate transparency over overclaiming.
-
-- [Limitation 1: e.g., "Authentication is mocked — not production-ready"]
-- [Limitation 2: e.g., "Only tested on Chrome"]
-- [Limitation 3: e.g., "Feature X is scaffolded but not fully implemented"]
-
----
-
-## 🏅 What We're Most Proud Of
-
-[Tell the judges what part of your submission is strongest and worth paying close attention to.]
-
----
+## What We’re Most Proud Of
+The entire solution runs from a single HTML file with full transparency of every weight, making it usable by real grid operators today and easy to evolve tomorrow.
