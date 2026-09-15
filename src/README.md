@@ -1,5 +1,4 @@
 # Source Code
 
-- `index.html` – Complete zero-install GridGuard AI dashboard.
-- Open the file directly in any modern browser (Chrome / Edge / Firefox).
-- No build step, no API keys, no internet required after the first Chart.js load.
+- `index.html` – Complete GridGuard AI dashboard (single file, zero install)
+- Open directly in browser – no build or server needed
