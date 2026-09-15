@@ -9,3 +9,5 @@ Grid operators need a single view that combines:
 - weather severity forecast
 - grid-impact of each asset
 into a prioritised, explainable action plan.
+
+The result is reactive maintenance, avoidable outages, and tens of billions of dollars spent annually across the industry.
