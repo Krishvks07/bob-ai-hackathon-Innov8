@@ -2,20 +2,22 @@
 
 ## Prerequisites
 - Any modern browser (Chrome, Edge, Firefox, Safari)
-- No Node, no Python, no API keys, no internet required after download
+- No other tools, accounts or API keys required
 
-## Run
-1. Open the file `src/index.html` in your browser.
-2. That is the entire application.
+## How to Run
+1. Open the file `src/index.html` in your browser
+2. The dashboard loads immediately
+3. Click any column header to sort the table
+4. Click the blue button **Generate Maintenance & Crew Plan**
 
-## Verify it works
-- You should see a table of 18 assets with risk scores.
-- Click any column header to sort.
-- Click the blue button **Generate Maintenance & Crew Plan**.
-- A prioritised plan with time windows appears below.
+## Verification
+- You should see an 18-asset table
+- A Top-8 bar chart
+- After clicking the button, a detailed prioritised plan appears at the bottom
 
 ## Troubleshooting
-| Symptom                    | Fix                              |
-|----------------------------|----------------------------------|
-| Blank page                 | Make sure you opened the .html file, not a folder |
-| Chart missing              | Check internet once (Chart.js CDN) or ignore – table still works |
+| Problem                    | Solution                              |
+|---------------------------|---------------------------------------|
+| Chart not showing         | Check internet (Chart.js CDN) once    |
+| Page is blank             | Make sure you opened index.html       |
+| Plan button does nothing  | Refresh the page and try again        |
